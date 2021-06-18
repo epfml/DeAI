@@ -22,6 +22,7 @@ export class CommunicationManager {
         this.receivers = new Set();
         this.activeReceivers = new Set();
         this.idleReceivers = new Set();
+        this.pings = new Map();
         this.isConnected = null;
         this.recvBuffer = null;
     }
@@ -107,14 +108,18 @@ export class CommunicationManager {
 
         let queryIds = await fetch(
             "http://35.242.193.186:".concat(String(this.portNbr)).concat("/deai/peerjs/peers"
-            )).then((response) => response.text());
+          )).then((response) => response.json());
 
-        console.log(queryIds)
-        let allIds = JSON.parse(queryIds);
-        let id = this.peerjsId;
-        this.receivers = allIds.filter(function (value) {
-            return value != id;
+        console.log(queryIds);
+        let allIds = queryIds;
+
+        this.receivers.clear();
+        allIds.forEach((value) => {
+          if (value != this.peerjsId) {
+              this.receivers.add(value);
+          }
         });
+
         this.updateActiveReceivers();
         this.updateIdleReceivers();
     }

@@ -86,8 +86,8 @@ function sleep(ms) {
 
 /**
  * Wait to receive data by checking if recvBuffer.key is defined
- * @param {Object} recvBuffer 
- * @param {*} key 
+ * @param {Object} recvBuffer
+ * @param {*} key
  */
 export function dataReceived(recvBuffer, key) {
     return new Promise((resolve) => {
@@ -103,8 +103,8 @@ export function dataReceived(recvBuffer, key) {
 
 /**
  * Same as dataReceived, but break after maxTries
- * @param {Object} recvBuffer 
- * @param {*} key 
+ * @param {Object} recvBuffer
+ * @param {*} key
  */
 export function dataReceivedBreak(recvBuffer, key) {
     return new Promise((resolve) => {
@@ -118,10 +118,10 @@ export function dataReceivedBreak(recvBuffer, key) {
 }
 
 /**
- * Waits until an array reaches a given length. Used to make 
+ * Waits until an array reaches a given length. Used to make
  * sure that all weights from peers are received.
- * @param {Array} recvBuffer where you will get the avgWeights from 
- * @param {int} len 
+ * @param {Array} recvBuffer where you will get the avgWeights from
+ * @param {int} len
  * @param {Boolean} isCommon true if this function is called on epoch common
  * @param {int} epoch epoch when this function is called
  */
@@ -134,7 +134,7 @@ export function dataReceivedBreak(recvBuffer, key) {
             }else{
                 arr = recvBuffer.avgWeights[epoch]
             }
-             
+
             if (arr.length >= len || MAX_TRIES <= n) {
                 return resolve();
             }
@@ -161,14 +161,14 @@ export async function makeid(length) {
  * Sends weights to all peers, waits to receive weights from all peers
  * and then averages peers' weights into the model.
 */
-// Added peerjs in argument 
+// Added peerjs in argument
 export async function onEpochEndSync(model, epoch, receivers, recvBuffer, peerjs) {
     const serializedWeights = await serializeWeights(model)
     const epochWeights = { epoch: epoch, weights: serializedWeights }
 
-    for (var i in receivers) {
-        console.log("Sending weights to: ", receivers[i])
-        await sendData(epochWeights, CMD_CODES.AVG_WEIGHTS, peerjs, receivers[i])
+    for (let receiver of receivers) {
+        console.log("Sending weights to: ", receiver)
+        await sendData(epochWeights, CMD_CODES.AVG_WEIGHTS, peerjs, receiver)
     }
 
     if (recvBuffer.avgWeights === undefined) {
@@ -180,42 +180,42 @@ export async function onEpochEndSync(model, epoch, receivers, recvBuffer, peerjs
         await dataReceived(recvBuffer.avgWeights, epoch.toString())
     }
     console.log("Waiting to receive all weights for this epoch...")
-    await checkArrayLen(recvBuffer, receivers.length, false, epoch)
+    await checkArrayLen(recvBuffer, receivers.size, false, epoch)
         .then(() => {
             console.log("Averaging weights")
-        
+
             averageWeightsIntoModel(recvBuffer.avgWeights[epoch], model)
-        
+
             // might want to delete weights after using them to avoiding hogging memory
             // delete recvBuffer.avgWeights[epoch]
         })
 }
 
 /**
- * Request weights from peers, carry on if the number of received weights is 
+ * Request weights from peers, carry on if the number of received weights is
  * greater than the provided threshold
 */
-// added peerjs in argument 
+// added peerjs in argument
 export async function onEpochEndCommon(model, epoch, receivers, recvBuffer, username, threshold, peerjs, trainingInformant) {
     const serializedWeights = await serializeWeights(model)
     var epochWeights = { epoch: epoch, weights: serializedWeights }
 
-    if(threshold == undefined){
+    if (threshold == undefined){
         threshold = 1
     }
 
     console.log("Receivers are: " + receivers)
     // request weights and send to all who requested
-    for (var i in receivers) {
+    for (let receiver of receivers) {
         // Sending  weight request
-        await sendData({ name: username }, CMD_CODES.WEIGHT_REQUEST, peerjs, receivers[i])
-        trainingInformant.addMessage("Sending weight request to: " + receivers[i])
+        await sendData({ name: username }, CMD_CODES.WEIGHT_REQUEST, peerjs, receiver)
+        trainingInformant.addMessage("Sending weight request to: " + receiver)
 
-        if (recvBuffer.weightRequests !== undefined && recvBuffer.weightRequests.has(receivers[i])) {
-            console.log("Sending weights to: ", receivers[i])
-            trainingInformant.addMessage("Sending weights to: " + receivers[i])
-            trainingInformant.updateWhoReceivedMyModel(receivers[i])
-            await sendData(epochWeights, CMD_CODES.AVG_WEIGHTS, peerjs, receivers[i])
+        if (recvBuffer.weightRequests !== undefined && recvBuffer.weightRequests.has(receiver)) {
+            console.log("Sending weights to: ", receiver)
+            trainingInformant.addMessage("Sending weights to: " + receiver)
+            trainingInformant.updateWhoReceivedMyModel(receiver)
+            await sendData(epochWeights, CMD_CODES.AVG_WEIGHTS, peerjs, receiver)
         }
     }
     if (recvBuffer.weightRequests !== undefined) {
@@ -225,7 +225,7 @@ export async function onEpochEndCommon(model, epoch, receivers, recvBuffer, user
 
     // wait to receive weights only if other peers are connected (i.e I have receivers for now, might need to be updates)
     // For now, no distinction between receivers and being connected to the server
-    if (receivers.length !== 0) {
+    if (receivers.size !== 0) {
         // wait to receive weights
         if (recvBuffer.avgWeights === undefined) {
             var startTime = new Date();
@@ -240,7 +240,7 @@ export async function onEpochEndCommon(model, epoch, receivers, recvBuffer, user
             }) // timeout to avoid deadlock (10s)
 
             // update the waiting time
-            
+
         }
 
         if (recvBuffer.avgWeights !== undefined) { // check if any weights were received
@@ -250,9 +250,9 @@ export async function onEpochEndCommon(model, epoch, receivers, recvBuffer, user
                     console.log("Averaging weights")
                     trainingInformant.updateNbrUpdatesWithOthers(1)
                     trainingInformant.addMessage("Averaging weights")
-                    
-                    averageWeightsIntoModel(Object.values(recvBuffer.avgWeights).flat(1), model) 
-                    
+
+                    averageWeightsIntoModel(Object.values(recvBuffer.avgWeights).flat(1), model)
+
                     delete recvBuffer.avgWeights // NOTE: this might delete useful weights...
                 })
         }
@@ -274,4 +274,3 @@ export async function onEpochEndCommon(model, epoch, receivers, recvBuffer, user
         peerjs.setDataHandler(handleDataEnd, endBuffer)
     }*/
 }
-

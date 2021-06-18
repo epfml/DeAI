@@ -2,6 +2,13 @@
   <div
     class="flex flex-col pt-4 items-right justify-start flex-1 h-full min-h-screen p-4 overflow-x-hidden overflow-y-auto"
   >
+    <!--  -->
+    <div>
+      <PeerManagementFrame
+        v-bind:communicationManager="communicationManager"
+        v-if="communicationManager"
+      />
+    </div>
     <!-- Data Format Card -->
     <a id="overview-target">
       <div class="grid grid-cols-1 p-4 space-y-8 lg:gap-8">
@@ -204,13 +211,6 @@
     </div>
 
     <div>
-      <PeerManagementFrame
-        v-bind:communicationManager="communicationManager"
-        v-if="communicationManager"
-      />
-    </div>
-
-    <div>
       <TrainingInformationFrame
         v-bind:trainingInformant="trainingInformant"
         v-if="trainingInformant"
@@ -284,7 +284,6 @@ import PeerManagementFrame from "./PeerManagementFrame";
 // takes care of communication
 var trainingManager = null;
 
-
 export default {
   name: "CsvTrainingFrame",
   props: {
@@ -348,6 +347,7 @@ export default {
   components: {
     UploadingFrame,
     TrainingInformationFrame,
+    PeerManagementFrame,
   },
   async mounted() {
     console.log("Mounted" + this.Task.trainingInformation.modelId)
