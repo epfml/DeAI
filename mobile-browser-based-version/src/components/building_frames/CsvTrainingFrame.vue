@@ -204,6 +204,13 @@
     </div>
 
     <div>
+      <PeerManagementFrame
+        v-bind:communicationManager="communicationManager"
+        v-if="communicationManager"
+      />
+    </div>
+
+    <div>
       <TrainingInformationFrame
         v-bind:trainingInformant="trainingInformant"
         v-if="trainingInformant"
@@ -272,6 +279,7 @@ import { TrainingManager } from "../../helpers/training_script/training_manager"
 import { FileUploadManager } from "../../helpers/data_validation_script/file_upload_manager";
 import UploadingFrame from "./UploadingFrame"
 import TrainingInformationFrame from "./TrainingInformationFrame";
+import PeerManagementFrame from "./PeerManagementFrame";
 
 // takes care of communication
 var trainingManager = null;
@@ -299,10 +307,10 @@ export default {
         this.Task.trainingInformation.modelId
       ),
 
-      // takes care of uploading file process 
+      // takes care of uploading file process
       fileUploadManager: new FileUploadManager(1, this),
 
-      
+
 
       // takes care of communication processes
       communicationManager: new CommunicationManager(9000), // TO DO: to modularize
@@ -315,7 +323,7 @@ export default {
     },
     async joinTraining(distributed) {
       const nbrFiles = this.fileUploadManager.numberOfFiles();
-      
+
       // Check that the user indeed gave a file
       if (nbrFiles == 0) {
         alert("Training aborted. No uploaded file given as input.");

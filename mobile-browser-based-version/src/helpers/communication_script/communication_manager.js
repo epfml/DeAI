@@ -6,8 +6,8 @@ import {
 } from "./peer";
 
 /**
- * Class that deals with communication with the PeerJS server. 
- * Collects the list of receivers currently connected to the PeerJS server. 
+ * Class that deals with communication with the PeerJS server.
+ * Collects the list of receivers currently connected to the PeerJS server.
  */
 export class CommunicationManager {
     /**
@@ -19,7 +19,9 @@ export class CommunicationManager {
         this.peerjsId = null;
         this.peer = null;
         this.peerjs = null;
-        this.receivers = [];
+        this.receivers = new Set();
+        this.activeReceivers = new Set();
+        this.idleReceivers = new Set();
         this.isConnected = null;
         this.recvBuffer = null;
     }
@@ -35,11 +37,11 @@ export class CommunicationManager {
     }
 
     /**
-     * Initialize the connection to the server. 
-     * @param {Number} epochs the number of epochs (required to initialize the communication buffer). 
+     * Initialize the connection to the server.
+     * @param {Number} epochs the number of epochs (required to initialize the communication buffer).
      */
     async initializeConnection(epochs, environment) {
-        // initialize the buffer 
+        // initialize the buffer
         this.recvBuffer = {
             trainInfo: {
                 epochs: epochs,
@@ -113,5 +115,53 @@ export class CommunicationManager {
         this.receivers = allIds.filter(function (value) {
             return value != id;
         });
+        this.updateActiveReceivers();
+        this.updateIdleReceivers();
+    }
+
+    updateIdleReceivers() {
+        // Remove stale peers
+        this.idleReceivers.forEach(receiver => {
+            if (!this.receivers.has(receiver)) {
+                this.idleReceivers.delete(receiver);
+            }
+        });
+    }
+
+    updateActiveReceivers() {
+        // Peers are active by default
+        this.receivers.forEach(receiver => this.activeReceivers.add(receiver));
+        // Remove stale peers
+        this.activeReceivers.forEach(receiver => {
+            if (!this.receivers.has(receiver)) {
+                this.activeReceivers.delete(receiver);
+            }
+        });
+    }
+
+    disableReceiver(peerId) {
+        if (!this.activeReceivers.has(peerId)) {
+            if (!this.idleReceivers.has(peerId)) {
+                console.log(`Peer ${peerId} does not exist.`)
+            } else {
+                console.log(`Peer ${peerId} is already disabled.`)
+            }
+        } else {
+            this.idleReceivers.add(peerId);
+            this.activeReceivers.delete(peerId);
+        }
+    }
+
+    enableReceiver(peerId) {
+        if (!this.idleReceivers.has(peerId)) {
+            if (!this.activeReceivers.has(peerId)) {
+                console.log(`Peer ${peerId} does not exist.`)
+            } else {
+                console.log(`Peer ${peerId} is already enabled.`)
+            }
+        } else {
+            this.activeReceivers.add(peerId);
+            this.idleReceivers.delete(peerId);
+        }
     }
 }
