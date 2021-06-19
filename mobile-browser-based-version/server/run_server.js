@@ -1,10 +1,12 @@
 const express               = require('express');
 const fs                    = require('fs');
+const cors                  = require('cors');
+const path                  = require('path');
 const { ExpressPeerServer } = require('peer');
 const topologies            = require('./topologies.js');
 const { makeId }            = require('./helpers.js');
 const { models }            = require('./models.js');
-const cors                  = require('cors');
+
 
 const app = express();
 app.use(cors());
@@ -36,14 +38,14 @@ function eventsHandler(request, response, next) {
     const data = `data: ${JSON.stringify(topology.getNeighbours(peerId))}\n\n`;
 
     response.write(data);
-  
+
     const newPeer = {
       id: peerId,
       response
     };
-  
+
     peers.push(newPeer);
-  
+
     request.on('close', () => {
       console.log(`${peerId} Connection closed`);
       peers = peers.filter(peer => peer.id !== peerId);
@@ -55,22 +57,24 @@ function eventsHandler(request, response, next) {
     peersToNotify.forEach(peer => peer.response.write(`data: ${JSON.stringify(topology.getNeighbours(peer.id))}\n\n`))
   }
 
-peerServer.on('connection', (client) => { 
+peerServer.on('connection', (client) => {
     let affectedPeers = topology.addPeer(client.getId())
     sendNewNeighbours(affectedPeers)
 });
 
-peerServer.on('disconnect', (client) => { 
+peerServer.on('disconnect', (client) => {
     let affectedPeers = topology.removePeer(client.getId())
     sendNewNeighbours(affectedPeers)
 });
 
-const tasks = JSON.parse(fs.readFileSync(myArgs[1]));
+Promise.all(models.map((createModel) => createModel()))
 
 const tasksRouter = express.Router();
-tasksRouter.get('/', (req, res) => res.send(tasks));
-tasks.forEach(task => {
-    tasksRouter.get('/' + task.taskId, (req, res) => res.send(models.get(task.taskId)))
+tasksRouter.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, myArgs[1]));
+});
+tasksRouter.get('/:id/:file', (req, res) => {
+    res.sendFile(path.join(__dirname, req.params['id'], req.params['file']))
 });
 
 app.get('/', (req, res) => res.send('DeAI Server'));

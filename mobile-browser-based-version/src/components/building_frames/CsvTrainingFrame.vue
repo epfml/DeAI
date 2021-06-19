@@ -299,13 +299,11 @@ export default {
         this.Task.trainingInformation.modelId
       ),
 
-      // takes care of uploading file process 
+      // takes care of uploading file process
       fileUploadManager: new FileUploadManager(1, this),
 
-      
-
       // takes care of communication processes
-      communicationManager: new CommunicationManager(9000), // TO DO: to modularize
+      communicationManager: new CommunicationManager(),
     };
   },
   methods: {
@@ -315,7 +313,7 @@ export default {
     },
     async joinTraining(distributed) {
       const nbrFiles = this.fileUploadManager.numberOfFiles();
-      
+
       // Check that the user indeed gave a file
       if (nbrFiles == 0) {
         alert("Training aborted. No uploaded file given as input.");
@@ -342,14 +340,14 @@ export default {
     TrainingInformationFrame,
   },
   async mounted() {
-    console.log("Mounted" + this.Task.trainingInformation.modelId)
+    console.log("Mounted " + this.Task.taskId)
     console.log(trainingManager)
     // This method is called when the component is created
     this.$nextTick(async function () {
       // initialize information variables
       this.modelName = this.Task.trainingInformation.modelId;
 
-      console.log("Mounting" + this.modelName)
+      console.log("Mounting " + this.modelName)
 
       this.dataFormatInfoText = this.Task.displayInformation.dataFormatInformation;
       this.dataExampleText = this.Task.displayInformation.dataExampleText;
