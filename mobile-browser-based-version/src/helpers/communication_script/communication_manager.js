@@ -190,4 +190,8 @@ export class CommunicationManager {
     isIdle(peerId) {
         return this.idleReceivers.has(peerId);
     }
+
+    getPing(peerId) {
+        return this.pings.get(peerId);
+    }
 }

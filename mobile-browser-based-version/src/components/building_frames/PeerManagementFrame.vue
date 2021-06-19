@@ -34,10 +34,10 @@
 
             <!-- Display all the possible headers -->
             <div>
-              <ul class="grid grid-cols-1 gap-4 p-4 lg:grid-cols-3 xl:grid-cols-6">
+              <ul class="grid grid-cols-1 gap-4 p-4 lg:grid-cols-2 xl:grid-cols-4">
                 <li
                   class="border-gray-400"
-                  v-for="receiver in this.receivers"
+                  v-for="receiver in this.communicationManager.receivers"
                   :key="receiver"
                 >
                   <div
@@ -53,7 +53,7 @@
                       </div>
                       <div class="flex flex-row justify-between">
                         <div class="text-gray-400">
-                          {{ this.pings.get(receiver) }}ms
+                          {{ this.communicationManager.getPing(receiver) }}ms
                         </div>
                         <div class="cursor-pointer transform hover:scale-125">
                           <div
@@ -113,6 +113,6 @@ export default {
   name: "PeerManagementFrame",
   props: {
       communicationManager: Object,
-  }
+  },
 }
 </script>
