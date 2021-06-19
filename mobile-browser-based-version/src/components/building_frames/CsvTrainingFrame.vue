@@ -2,13 +2,6 @@
   <div
     class="flex flex-col pt-4 items-right justify-start flex-1 h-full min-h-screen p-4 overflow-x-hidden overflow-y-auto"
   >
-    <!--  -->
-    <div>
-      <PeerManagementFrame
-        v-bind:communicationManager="communicationManager"
-        v-if="communicationManager"
-      />
-    </div>
     <!-- Data Format Card -->
     <a id="overview-target">
       <div class="grid grid-cols-1 p-4 space-y-8 lg:gap-8">
@@ -208,6 +201,13 @@
       >
         Train Distributed
       </button>
+    </div>
+
+    <div>
+      <PeerManagementFrame
+        v-bind:communicationManager="communicationManager"
+        v-if="communicationManager"
+      />
     </div>
 
     <div>

@@ -13,16 +13,12 @@
                 <span aria-hidden="true">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    class="h-6 w-6"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+                    class="h-7 w-7"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
                   >
                     <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M5 13l4 4L19 7"
+                      d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"
                     />
                   </svg>
                 </span>
@@ -57,11 +53,11 @@
                       </div>
                       <div class="flex flex-row justify-between">
                         <div class="text-gray-400">
-                          700ms
+                          {{ this.pings.get(receiver) }}ms
                         </div>
                         <div
-                          class="hover:text-green-700"
-                          v-on:click="this.activeReceivers.add(receiver);this.idleReceivers.delete(receiver)"
+                          class="text-green-700 hover:text-green-500 transform hover:scale-125"
+                          v-on:click="this.communicationManager.enableReceiver(receiver)"
                           v-if="this.idleReceivers.has(receiver)"
                         >
                           <svg
@@ -80,8 +76,8 @@
                           </svg>
                         </div>
                         <div
-                          class="hover:text-red-700"
-                          v-on:click="this.activeReceivers.delete(receiver);this.idleReceivers.add(receiver)"
+                          class="text-red-700 hover:text-red-500 transform hover:scale-125"
+                          v-on:click="this.communicationManager.disableReceiver(receiver)"
                           v-if="this.activeReceivers.has(receiver)"
                         >
                           <svg
@@ -89,14 +85,13 @@
                             class="h-6 w-6"
                             fill="none"
                             viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="3"
-                              d="M5 13l4 4L19 7"
-                            />
+                            stroke="currentColor">
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"
+                              />
                           </svg>
                         </div>
                       </div>
@@ -114,13 +109,8 @@
 <script>
 export default {
   name: "PeerManagementFrame",
-  data() {
-    return {
-    //communicationManager: Object,
-    receivers: new Set([143128736,23123213123,3123213213,4544,555,66,7777]),
-    activeReceivers: new Set([143128736,23123213123,3123213213,4544,555,66,7777]),
-    idleReceivers: new Set(),
-    }
+  props: {
+      communicationManager: Object,
   }
 }
 </script>

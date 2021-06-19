@@ -124,6 +124,19 @@ export class CommunicationManager {
         this.updateIdleReceivers();
     }
 
+    async udpatePings() {
+        this.activeReicevers.forEach((receiver) => {
+            let startTime = performance.now();
+            let endTime;
+            // Very basic ping (even wrong) measurement, to enhance
+            const conn = this.localPeer.connect(receiver);
+            conn.on('open', () => {
+                endTime = performance.now();
+            });
+            this.pings.set(receiver, endTime - startTime);
+        });
+    }
+
     updateIdleReceivers() {
         // Remove stale peers
         this.idleReceivers.forEach(receiver => {
