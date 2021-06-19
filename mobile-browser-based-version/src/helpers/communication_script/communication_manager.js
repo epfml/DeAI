@@ -182,4 +182,12 @@ export class CommunicationManager {
             this.idleReceivers.delete(peerId);
         }
     }
+
+    isActive(peerId) {
+        return this.activeReceivers.has(peerId);
+    }
+
+    isIdle(peerId) {
+        return this.idleReceivers.has(peerId);
+    }
 }
