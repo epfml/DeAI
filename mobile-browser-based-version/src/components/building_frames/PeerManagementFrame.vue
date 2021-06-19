@@ -43,58 +43,57 @@
                   <div
                     class="select-none p-2 transition duration-500 ease-in-out transform hover:-translate-y-2 rounded-2xl border-2 p-6 hover:shadow-2xl border-primary-dark"
                   >
-                    <div class="grid grid-cols-1 grid-rows-2 items-center">
-                      <div class="pl-1">
-                        <div class="font-medium">
-                          <div class="flex flex-row justify-start">
-                            {{ receiver }}
-                          </div>
-                        </div>
+                    <div
+                      class="grid grid-cols-3 grid-rows-3 place-items-center p-4 bg-white rounded-md dark:bg-darker dark:bg-dark"
+                    >
+                      <div class="row-start-1 col-span-2 font-medium">
+                        {{ receiver }}
                       </div>
-                      <div class="flex flex-row justify-between">
-                        <div class="text-gray-400">
-                          {{ this.communicationManager.getPing(receiver) }}ms
-                        </div>
-                        <div class="cursor-pointer transform hover:scale-125">
-                          <div
-                            class="text-green-700 hover:text-green-500"
-                            v-on:click="this.communicationManager.enableReceiver(receiver)"
-                            v-if="this.communicationManager.isIdle(receiver)"
+                      <div class="row-start-2 col-span-2 text-gray-400 font-medium">
+                        placeholder 1
+                      </div>
+                      <div class="row-start-3 col-span-2 text-gray-400 font-medium">
+                        placeholder 2
+                      </div>
+                      <div class="row-span-3 col-start-3 cursor-pointer transition duration-500 ease-in-out transform hover:scale-125">
+                        <div
+                          class="text-green-700 transition duration-500 ease-in-out hover:text-green-500"
+                          v-on:click="this.communicationManager.enableReceiver(receiver)"
+                          v-if="this.communicationManager.isIdle(receiver)"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-10 w-10"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
                           >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              class="h-6 w-6"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="3"
+                              d="M5 13l4 4L19 7"
+                            />
+                          </svg>
+                        </div>
+                        <div
+                          class="text-red-700 transition duration-500 ease-in-out hover:text-red-500"
+                          v-on:click="this.communicationManager.disableReceiver(receiver)"
+                          v-if="this.communicationManager.isActive(receiver)"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-10 w-10"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor">
                               <path
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
-                                stroke-width="3"
-                                d="M5 13l4 4L19 7"
+                                stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"
                               />
-                            </svg>
-                          </div>
-                          <div
-                            class="text-red-700 hover:text-red-500"
-                            v-on:click="this.communicationManager.disableReceiver(receiver)"
-                            v-if="this.communicationManager.isActive(receiver)"
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              class="h-6 w-6"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor">
-                                <path
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  stroke-width="2"
-                                  d="M6 18L18 6M6 6l12 12"
-                                />
-                            </svg>
-                          </div>
+                          </svg>
                         </div>
                       </div>
                     </div>
@@ -114,5 +113,11 @@ export default {
   props: {
       communicationManager: Object,
   },
+  mounted() {
+      let dummyPeers = ['1234567891110', '333330912381'];
+      dummyPeers.forEach(peer => this.communicationManager.receivers.add(peer));
+      this.communicationManager.updateActiveReceivers();
+      this.communicationManager.updateIdleReceivers();
+  }
 }
 </script>
